@@ -374,21 +374,14 @@
 
       
         
-          
-            <p>这是一道常见的考察对字符串理解的题目，很多大公司在面试或者笔试的时候都会问到这个题目，所以在此特意单独拿出来分析一下具体的解题过程和思路，与大家共勉。希望大家在以后的工作和学习中也要多多积累，点点滴滴，不断提高自己的思维能力。
-&lt;!--more--&gt;
-首先我们想到的是输入一段JSON格式的字符串，一般情况下要用StringBuilder做为整个代码的载体，同时还要有一个具体的转换函数，它的作用就是将下划线之后的字母替换为大写字母，一般情况下，一个JSON格式的数据类似于下面这种形式：
-&lt;img src=&quot;http://okmofxifx.bkt.clouddn.com/json.png&quot; width=&quot;400&quot; height=&quot;400&quot;/&gt;
-它是由很多｛｝组成，并且每个大的模块可能又包含许多小的模块，所以实现代码的时候肯定要用到递归函数。下面具体实现这个过程，并注释讲解：
-先来看main函数：
-&lt;img src=&quot;http://okmofxifx.bkt.clouddn.com/main.png&quot; width=&quot;800&quot; height=&quot;800&quot;/&gt;
-然后看转换函数：
-&lt;img src=&quot;http://okmofxifx.bkt.clouddn.com/zhuanhuan.png&quot; width=&quot;800&quot; height=&quot;800&quot;/&gt;
-最终转换后的效果是：
-&lt;img src=&quot;http://okmofxifx.bkt.clouddn.com/end.png&quot; width=&quot;400&quot; height=&quot;400&quot;/&gt;
-通过这个例子，大家可能更深入的了解了递归的相关知识，这些在以后的学习和工作中都会有很大的帮助，希望这期的讲解能给大家一些启发，做到举一反三，让以后的日常工作更加高效。</p>
-
-          
+          <p>这是一道常见的考察对字符串理解的题目，很多大公司在面试或者笔试的时候都会问到这个题目，所以在此特意单独拿出来分析一下具体的解题过程和思路，与大家共勉。希望大家在以后的工作和学习中也要多多积累，点点滴滴，不断提高自己的思维能力。<br>
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2018/07/08/写一段Java程序，将JSON中下划线命名的key转换为驼峰式命名的key/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
@@ -537,118 +530,14 @@
 
       
         
-          
-            <p>在日常的工作中，我们经常会遇到性能瓶颈的问题，这里我们一起深入来研究一下JVM内部的一些机制与原理，以便以后大家再次遇到类似问题的时候，一起进步与成长。
-&lt;!--more--&gt;
-首先来看Java虚拟机运行时的数据区域，一般情况下可以分为程序计数器、Java虚拟机栈、本地方法栈、Java堆、方法区。
-&lt;img src=&quot;http://okmofxifx.bkt.clouddn.com/zone.jpg&quot; width=&quot;400&quot; height=&quot;400&quot;/&gt;</p>
-<h2>JVM运行时数据区域</h2>
-<h3>程序计数器。</h3>
-<p>程序计数器可以看做是当前线程所执行的字节码的行号指示器。字节码解释器工作时就是通过改变这个计数器的值来选取下一条需要执行的字节码指令。程序计数器是线程私有的，每条线程都需要有一个独立的程序计数器，独立存储，互不影响。如果线程执行的是一个Java方法，计数器记录的是正在执行的虚拟机字节码指令的地址，如果线程执行的是一个Native方法，计数器的值为空。</p>
-<h3>Java虚拟机栈。</h3>
-<p>Java虚拟机栈描述的是Java方法执行的内存模型：每个方法执行的同时会创建一个栈帧，栈帧用于存储局部变量表、操作数栈、动态链接、方法出口等信息。每个方法从调用直至执行完成的过程，就对应着一个栈帧在虚拟机栈中入栈到出栈的过程。Java虚拟机栈是线程私有的，它的生命周期与线程相同。虚拟机栈中局部变量表stack栈内存部分存放了编译时期可知的各种基本数据类型和对象引用，Java虚拟机规范对这个区域规定了两种异常情况：如果线程请求的栈深度大于虚拟机所允许的深度，将抛出StackOverflowError异常，如果虚拟机栈可以动态扩展，如果扩展时无法申请到足够的内存，就会抛出OutOfMemoryError异常。</p>
-<h3>本地方法栈。</h3>
-<p>虚拟机栈为虚拟机执行Java方法服务（也就是字节码），而本地方法栈为虚拟机使用到的Native方法服务。同Java虚拟机栈相同，这个区域也规定了两种异常情况StackOverflowError和OutOfMemoryError异常。</p>
-<h3>Java堆。</h3>
-<p>Java堆是被所有的线程共享的一块内存区域，在虚拟机启动时创建，目的就是存放对象实例。Java堆是垃圾回收器管理的主要区域，因此也被称为&quot;GC堆&quot;。Java堆可以处于物理上不连续的内存空间中，只要逻辑上是连续的即可，在实现上，既可以是固定大小的，也可以是可扩展的，不过当前主流JVM都是按照可扩展来实现。如果在堆上没有内存完成实例分配，并且堆上也无法再扩展时，将会抛出OutOfMemoryError异常。内存泄露：指程序中一些对象不会被GC所回收，它始终占用内存，即被分配的对象引用链可达但已无用。内存溢出：程序运行过程中无法申请到足够的内存而导致的一种错误。内存溢出通常发生于OLD段或Perm段垃圾回收后，仍然无内存空间容纳新的Java对象的情况。内存泄露是内存溢出的一种诱因，但不是唯一因素。</p>
-<h3>方法区。</h3>
-<p>方法区也是被所有的线程共享的一块内存区域。它用于存储已被虚拟机加载的类信息、常量、静态变量、即时编译器编译后的代码等数据。方法区不需要连续的内存和可以选择固定大小或者可扩展之外，还可以选择不实现垃圾回收，当方法区无法满足内存分配的需求时，将抛出OutOfMemoryError异常。</p>
-<h2>JVM垃圾回收</h2>
-<p>在JVM五种内存模型中，有三个是不需要进行垃圾回收的：程序计数器、Java虚拟机栈、本地方法栈。因为它们的生命周期是和线程同步的，随着线程的销毁，它们占用的内存会自动释放，只有方法区和Java堆需要进行GC。</p>
-<h3>引用计数算法:</h3>
-<p>引用计数是最简单直接的一种方式，这种方式在每一个对象中增加一个引用的计数，这个计数代表当前程序有多少个引用引用了此对象，如果此对象的引用计数变为0，那么此对象就可以作为垃圾收集器的目标对象来收集。</p>
-<h3>根搜索算法：</h3>
-<p>通过一系列的名为“GC Root”的对象作为起点，从这些节点向下搜索，搜索所走过的路径称为引用链，当一个对象到GC Root没有任何引用链相连时，则该对象不可达，该对象是不可使用的，垃圾收集器将回收其所占的内存。</p>
-<h3>标记-清除算法</h3>
-<p>标记清除收集器停止所有的工作，从根扫描每个活跃的对象，然后标记扫描过的对象，标记完成以后，清除那些没有被标记的对象。</p>
-<h3>复制算法</h3>
-<p>复制收集器将内存分为两块一样大小空间，某一个时刻，只有一个空间处于活跃的状态，当活跃的空间满的时候，GC就会将活跃的对象复制到未使用的空间中去，原来不活跃的空间就变为了活跃的空间。</p>
-<h3>标记-整理算法</h3>
-<p>标记整理收集器汲取了标记清除和复制收集器的优点，它分两个阶段执行，在第一个阶段，首先扫描所有活跃的对象，并标记所有活跃的对象，第二个阶段首先清除未标记的对象，然后将活跃的的对象复制到堆得底部。</p>
-<h3>分代回收算法</h3>
-<p>内存主要被分为三块，新生代、年老代、持久代。
-Young（年轻代、新生代）：
-新生代使用复制算法和标记-清除垃圾收集算法。Java虚拟机对新生代的垃圾回收称为Minor GC。年轻代分三个区。一个Eden区，两个Survivor区。大部分对象在Eden区中生成。当Eden区满时，还存活的对象将被复制到Survivor区（两个中的一个），当这个Survivor区满时，此区的存活对象将被复制到另外一个Survivor区，当这个Survivor去也满了的时候，从第一个Survivor区复制过来的并且此时还存活的对象，将被复制到旧生代。
-Tenured（年老代、旧生代）：
-年老代中使用标记-整理垃圾回收算法。Java虚拟机对年老代的垃圾回收称为MajorGC/Full GC。年老代存放从年轻代存活的对象。一般来说年老代存放的都是生命期较长的对象，对象的存活率比较高。
-Perm（持久代、永久代）：
-永久代也使用标记-整理算法进行垃圾回收。持久代用于存放静态文件，如各种Java类、方法等，持久代对垃圾回收没有显著影响，但是有些应用可能动态生成或者调用一些class，例如Hibernate等，在这种时候需要设置一个比较大的持久代空间来存放这些运行过程中新增的类。java虚拟机内存中的方法区在SunHotSpot虚拟机中被称为永久代，是被各个线程共享的内存区域，它用于存储已被虚拟机加载的类信息、常量、静态变量、即时编译后的代码等数据。永久代垃圾回收比较少，效率也比较低，但是也必须进行垃圾回收，否则会永久代内存不够用时仍然会抛出OutOfMemoryError异常。</p>
-<h2>实例讲解</h2>
-<h3>OutOfMemoryError异常</h3>
-<p>虚拟机扩展时无法申请到足够的内存空间，首先看下面的代码：
-&lt;img src=&quot;http://okmofxifx.bkt.clouddn.com/OutOfMemoryError.png&quot; width=&quot;600&quot; height=&quot;600&quot;/&gt;
-运行这段代码就会抛出异常：
-&lt;img src=&quot;http://okmofxifx.bkt.clouddn.com/Error1.png&quot; width=&quot;600&quot; height=&quot;600&quot;/&gt;
-这个时候我们也可以在VisualVM下查看相应的堆栈信息：
-&lt;img src=&quot;http://okmofxifx.bkt.clouddn.com/stack1.png&quot; width=&quot;600&quot; height=&quot;600&quot;/&gt;
-这种异常比较常见，一般先通过内存映像分析工具对Dump出来的堆转储快照进行分析，确实是内存泄露还是内存溢出，然后再进行相应的处理操作。</p>
-<h3>StackOverFlow异常</h3>
-<p>递归调用方法，定义大量的本地变量，增大此方法帧中本地变量表的长度：
-&lt;img src=&quot;http://okmofxifx.bkt.clouddn.com/StackOverflowError.png&quot; width=&quot;600&quot; height=&quot;600&quot;/&gt;
-这个时候就要考虑如何减少最大堆和减少栈容量能够换区更多的线程。</p>
-<h2>性能调优</h2>
-<h3>堆大小：</h3>
-<p>-Xms
-初始堆大小，默认为物理内存的1/64
--Xmx
-最大堆大小，默认空余堆内存大于70%时，JVM会减少堆直到 -Xms的最小限制
-1、新生代
--XX:NewSize
-新生代空间大小初始值
--XX:MaxNewSize
-新生代空间大小最大值
--Xmn
-新生代空间大小，此处的大小是(2个eden+1个survivor)
-2、永久代
--XX:PermSize
-永久代空间的初始值&amp;最小值
--XX：MaxPermSize
-永久代空间的最大值
-3、老年代：空间大小会根据新生代的大小隐式设定
-初始值=-Xmx减去-XX:NewSize的值
-最小值=-Xmx值减去-XX:MaxNewSize的值</p>
-<h3>VM运行参数argument说明</h3>
-<p>-verbose:gc	
-显示GC的操作内容
--Xms20M -Xmx20M	
-设置堆大小为20M
--Xmn10M	
-设置新生代的内存空间大小为10M
--XX:+PrintGCDetails	
-打印GC中的变化
--XX:SurvivorRatio=8	
-新生代中Eden区域与Survivor区域的大小比值
--XX:+UseSerialGC
-在新生代和老年代中使用串行收集器，由于-verbose:gc参数对Parallel Scavenge收集器不起作用，无法显示显示GC的操作内容，因此采用串行收集器
--Xloggc:eclipse_gc.log
-打印日志位置</p>
-<h3>堆空间分配规则</h3>
-<p>Java堆空间：3-4倍FullGC后的老年代空间占用。
-新生代：1-1.5倍FullGC之后的老年代空间占用。
-老年代：2-3倍FullGC后的老年代空间占用。
-永久代：1.2-1.5倍FullGc后的永久代空间占用。
-下面分析一段Java代码：
-&lt;img src=&quot;http://okmofxifx.bkt.clouddn.com/Error2.png&quot; width=&quot;600&quot; height=&quot;600&quot;/&gt;
-接下来运行这段代码，分析一下GC日志信息：
-&lt;img src=&quot;http://okmofxifx.bkt.clouddn.com/GC.png&quot; width=&quot;800&quot; height=&quot;800&quot;/&gt;
-可以看出，暂时程序是没有FullGC记录的，可以采用监控工具强制调用一次，或者采用以下命令：
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">jmap -histo:live pid</span><br></pre></td></tr></table></figure></p>
-<p>其中jps用于列出所有Java相关线程的pid等信息，而使用jmap dump可以分析JVM内存状态：
-查看整个JVM内存状态：
-&lt;img src=&quot;http://okmofxifx.bkt.clouddn.com/jmap.png&quot; width=&quot;600&quot; height=&quot;600&quot;/&gt;
-查看JVM堆中对象详细占用情况:
-&lt;img src=&quot;http://okmofxifx.bkt.clouddn.com/histo.png&quot; width=&quot;600&quot; height=&quot;600&quot;/&gt;
-这里以本机代码运行为例进行分析：
-首先，可以看出老年代的空间占用在8248K，大约是8.2M，我们以此定为老年代空间的活跃数据。基于之前的规则，现在可以规划的该应用堆空间为：
-Java堆空间：8.2M<em>4=32.8M(老年代的4倍)
-新生代空间：8.2</em>1.5=12.3M（老年代的1.5倍）
-老年代空间：32.8-12.3=20.5M（Java堆空间-新生代空间）
-永久代空间：2.5*1.5=3.75（永久代的1.5倍）
-所以最后对应应用的启动参数为：
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">java -Xms32.8m -Xmx32.8m -Xmn12.3m -XX:PermSize=3.75m -XX:MaxPermSize=3.75m</span><br></pre></td></tr></table></figure></p>
-<p>JVM调优是一个系统而又复杂的工作，以后关于这方面我还会继续深入的研究与探索，希望与大家一起进步。</p>
-
-          
+          <p>在日常的工作中，我们经常会遇到性能瓶颈的问题，这里我们一起深入来研究一下JVM内部的一些机制与原理，以便以后大家再次遇到类似问题的时候，一起进步与成长。<br>
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2018/07/07/JVM垃圾回收与性能调优/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
@@ -785,38 +674,14 @@ Java堆空间：8.2M<em>4=32.8M(老年代的4倍)
 
       
         
-          
-            <p>很多人在日常的工作和学习中都会翻墙查看国外的一些网站资料，对比了很多国外的服务器，这里我最终VPS选择的是Vultr，在这里简单给大家介绍一下搭建流程，仅供参考。
-&lt;!--more--&gt;
-首先进入Vultr的官方网站，网址是：
-https://www.vultr.com
-选择一款合适的服务器，一般情况下新加坡、悉尼和东京的站点是比较稳定且网速较快的。
-&lt;img src=&quot;http://okmofxifx.bkt.clouddn.com/Deploy.png&quot; width=&quot;800&quot; height=&quot;800&quot;/&gt;
-这里我选择的是悉尼节点，部署成功之后可以在Server Information里面看到详细信息：
-&lt;img src=&quot;http://okmofxifx.bkt.clouddn.com/Server%20Infomation.png&quot; width=&quot;800&quot; height=&quot;800&quot;/&gt;
-也可以在自己的电脑商品ping一下这个地址，看到延迟还是可以接受的：
-&lt;img src=&quot;http://okmofxifx.bkt.clouddn.com/ping.png&quot; width=&quot;600&quot; height=&quot;600&quot;/&gt;
-接下来就是登录到你的服务器上面，配置文件是ShadowSocks.json，在这里输入你的server_port、local_port、password以及method，配置后保存。
-&lt;img src=&quot;http://okmofxifx.bkt.clouddn.com/config.png&quot; width=&quot;600&quot; height=&quot;600&quot;/&gt;
-也可以分别执行下面的命令一键安装：
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">wget --no-check-certificate -O ShadowSocks.sh https://raw.githubusercontent.com/teddysun/ShadowSocks_install/master/ShadowSocks.sh</span><br><span class="line"></span><br><span class="line">chmod +x ShadowSocks.sh</span><br><span class="line"></span><br><span class="line">./ShadowSocks.sh 2&gt;&amp;1 | tee ShadowSocks.log</span><br></pre></td></tr></table></figure></p>
-<p>安装过程中的一些日志信息，我们也能在shaowsocks.log里面看到：
-&lt;img src=&quot;http://okmofxifx.bkt.clouddn.com/shadowSocksLog.png&quot; width=&quot;600&quot; height=&quot;600&quot;/&gt;
-至此安装完毕，这里如果想详细了解一下这个过程的工作原理，这里再介绍另外一种手动安装方式：
-第一步：安装组件。
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">yum install m2crypto python-setuptools</span><br><span class="line"></span><br><span class="line">easy_install pip</span><br><span class="line"></span><br><span class="line">pip install ShadowSocks</span><br></pre></td></tr></table></figure></p>
-<p>第二步：安装完成后配置服务器参数。
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">vi  /etc/ShadowSocks.json</span><br></pre></td></tr></table></figure></p>
-<p>然后写入之前第一种方法中的配置文件内容。
-第三步：配置防火墙。
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#安装防火墙</span></span><br><span class="line">yum install firewalld</span><br></pre></td></tr></table></figure></p>
-<p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#启动防火墙</span></span><br><span class="line">systemctl start firewalld</span><br></pre></td></tr></table></figure></p>
-<p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#开启防火墙相应的端口，端口号是自己设置</span></span><br><span class="line">firewall-cmd --permanent --zone=public --add-port=443/tcp</span><br><span class="line">firewall-cmd --reload</span><br></pre></td></tr></table></figure></p>
-<p>第四步：启动ShadowSocks服务。
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ssserver -c /etc/ShadowSocks.json</span><br></pre></td></tr></table></figure></p>
-<p>到了这一步，就可以愉快的在Shadowsocks.exe添加你的的VPS了，小伙伴们，快去愉快的使用吧。</p>
-
-          
+          <p>很多人在日常的工作和学习中都会翻墙查看国外的一些网站资料，对比了很多国外的服务器，这里我最终VPS选择的是Vultr，在这里简单给大家介绍一下搭建流程，仅供参考。<br>
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2018/07/07/Vultr搭建ShadowSocks教程/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
@@ -965,136 +830,14 @@ https://www.vultr.com
 
       
         
-          
-            <p>很多人问我，如何做年度计划才能遇见更好的自己？我看了一些自我管理达人和身边优秀的朋友，他们说：想成为更好的自己，我们需要学习一点投资理念，制定合理的梦想清单，然后让愿景清晰可见，而且你需要给自己的目标做分解，不断复盘、自我激励才能更好的去实现。&lt;br&gt;毕竟生活不止眼前的苟且，还有诗和远方的田野：
-&lt;!--more--&gt;</p>
-<h2>计划列表</h2>
-<h3>学习</h3>
-<p>1、不断继续深入学习JAVA方面的知识，深入研究并发编程。
-2、英语，每天学习1小时左右，目标达到英语口语、听力相应的标准，能够与外国朋友进行简单的交流，在外旅行无忧。
-3、练字，报名练字培训班，坚持2个月，每天跟着练字班的进度走，每天1小时，字体达到架构合理、自然大方的状态。
-4、学习思维导图，报名思维导图课程，学习一个月左右，每天拿出一个小时学习，达到能够可视化传达的效果。
-5、参加演讲课程学习，比如行动派和一些演讲类的课程。
-6、使用有道笔记、番茄钟等工具进行时间管理，保证自己的学习效率。
-7、看50期左右TED演讲，每周一期，用简单的笔记和思维导图做出重点，并能够进行输出。
-8、得到专栏课程、荔枝微课、知乎live的课程上5个左右，两个月左右上一个。
-9、其它兴趣类的学习，比如烘焙、茶道等学习。</p>
-<h3>生活</h3>
-<p>生活要丰富多彩，要有品质。希望2018年更加极简主义，料理好自己的生活，一杯茶、一锅汤、一张床、一捧花，理想生活：
-10、极简生活，每天发现生活的小美好并记录。
-11、养几条金鱼，把鱼缸打扫的干干净净，看着小鱼儿游来游去。
-12、养一盆绿植、鲜花，放在自己的书桌、工作台，每天睡前、起床呼吸一下花香。
-13、每天整理自己的床铺，把书、衣物等放到固定的地方。
-14、学习一项生活技能，比如修车、缝纫等，注意车的维护、半年保养一次，装饰好自己的爱车
-15、极简生活主义，断舍离，注意收纳整理。
-16、平均每月购买两三件喜欢的小物品，每周至少一次大扫除，处理不用的物品。
-17、坚持早睡早起的习惯，每天7点左右起床，11点30左右开始洗漱、泡脚睡觉。
-18、每天要喝8杯水，早上2杯，上午2杯，中午1杯，下午1杯，晚上1杯，睡前1杯水。
-19、做美食，一年会做30道菜，其中学会煲汤和一些南方的美食，在家里办5场左右的家宴。
-20、控制自己的饮食能量，五谷，燃脂蛋白（肉类）、果蔬、燃脂蛋白（非肉类）都要涉及，做到营养均衡。</p>
-<h3>休闲</h3>
-<p>休闲是满足自己的精神需求，对生活不断挖掘和尝试，让生活不单调乏味，愈加精彩。
-21、每周看一部电影，提高对电影的欣赏水平，写10篇左右的影评。
-22、和她看一场演唱会，一起挥舞着荧光棒，在人群中高喊、唱歌。
-23、看一场话剧，看开心麻花的演出。
-24、听一场相声，最好是天津、北京、长沙相声剧坊的那种。
-25、看一场线下艺术展览，北京或者深圳名家的展览。
-26、搞一次家庭轰趴活动,邀请一些有趣的人，我亲自下厨做几道拿手菜招待他们。
-27、开一场小型音乐会，也许在山谷里，也许在小酒吧，唱两三首喜欢的歌。
-28、找到在录音棚工作的朋友，参加一场节目录制，制作属于自己的专辑。
-29、办一次主题分享会，给台下的听众讲一些有趣的干货，比如面试、比如时间管理、比如我的故事。
-30、参加一次户外野营活动，学习在野外取水，搭帐篷，获取食物，登山越野露营，锻炼自己在野外生存，环境适应力和意志力。</p>
-<h3>运动</h3>
-<p>运动是每天必须坚持的事情，2018年希望自己更加出众。
-31、坚持每天晚上10点夜跑5公里+，一年跑1000公里左右。
-32、在自己身体的许可下完成一次半程马拉松。
-33、参加一次登山越野跑。
-34、20次左右的健身，根据教练的指导，锻炼胸肌。
-35、参加一些趣味的运动活动，比如彩跑等。</p>
-<h3>写作</h3>
-<p>写作是热爱的事情，也是属于核心技能，要继续不断强化。
-36、每周2-3篇更文，质量胜于数量，按照出书目录，保证2篇是在同一个方向的写作，写100篇文章。
-37、通过文章自然积累，10次左右互推，转载等形式，公号粉丝1万+。
-38、保持节奏更文，写读者喜欢的文章，让读者都能有所收益。
-39、跟一些出版社、图书策划经纪人沟通，认识一些优质资源，为出书做准备。
-40、报名一个写作课程，与大家写作打卡，认识10名左右热爱写作的好友。
-41、采访写10人+的故事，并邀请作为会客厅的常驻作者。</p>
-<h3>读书</h3>
-<p>读书的好处不多说，越读书越幸运，继续坚持。
-42、买书投入3000+，每个月要在买书6本，选择3-5阅读主题，选择自己喜欢的书购买。
-43、去30个+不同的书店、图书馆，在那里淘一本好书，感受读书的快乐。
-44、重读10本好书，至少2遍以上，整理出书中的层次结构，知识体系，能够有效的输出。
-45、读书60本，每天读书1小时左右，周末的半天读书，整理30篇高质量的读书笔记。
-46、参加3次左右的读书分享。</p>
-<h3>摄影</h3>
-<p>摄影是让人和生活变得事情，也是一种新的技能，所以2018年要继续的强化。
-47、选择人物、风景、宠物、运动等主题，拍出至少10组照片，要有创意，让人眼前一亮。
-48、体验无人机航拍，运动相机航拍。
-49、报名参加一个摄影课程，学习对焦虚化、构图、创意，和喜欢摄影的同城的朋友去采风。
-50、学习一款修图软件，把相片试着在一些网站上传播，比如旅行照放在马蜂窝等。
-51、购买一些拍摄的设备，比如广角镜头、微距镜头，自拍器，运动相机等。</p>
-<h3>理财</h3>
-<p>财务状况，是支撑一个人发展的重点，我们离不开物质，更要赚钱，为自己的梦想埋单。
-52、记录整理自己的收支情况，保证收支情况清晰，不盲目消费。
-53、投资一些理财的产品，保证能有高于银行50%的收益。
-54、继续学习理财知识，做一次理财方面的咨询，更好的了解理财的方向。
-55、平衡流动资金，为自己在学习、兴趣、生活、社交付费等，学习的付费应该为每月1000元的预算。</p>
-<h3>社交</h3>
-<p>见贤思齐，以人为师，好的交际圈子会让人成长进步的更快。
-56、参加有味读书会等社交活动，学习他人社交管理方法。
-57、组织一次年会，做一次年度总结。
-58、认识30个有趣的人，试睡师、畅销书作家、书房创始人等。
-59、微博粉丝、咕咚粉丝3000+.
-60、通过渠道、在行约见牛人5人+。</p>
-<h3>家人</h3>
-<p>对每个人来说，家庭的重要性不言而喻，全家幸福是我这么多年一直坚持做的事情，2018年要做的更好！
-61、给父母10000元+压岁钱，用于他们日常消费。
-62、给家里添置一样家电，比如更换更好配置的电视。
-63、至少给父母过一次生日，给父母买一些生日礼物。
-64、家宴10次，过节回家家里的大型宴请承担一次。
-65、给父母和家人每年买一身衣服、做一次体检。
-66、带家人来至少一次的旅行。
-67、帮助家人制定梦想清单，实现至少一个愿望。</p>
-<h3>旅行</h3>
-<p>旅行是诗和远方一个重要方面，当一个人在第一个地方呆腻了就出去走走，遇见更好的自己！
-68、去一趟国外，泰国或者附近的小岛。
-69、拍摄20个城市的天空。
-70、脚步丈量6个城市。
-71、尝试100种不同的美食，特别是那种地方特色。
-72、交10个旅行中的朋友。
-73、乘坐一次春秋航空。
-74、拍摄2000张+旅行图片。
-75、寄出100张明信片。
-76、写5篇+游记。
-77、感受五星级酒店、民宿等。
-78、去体验一次米其林餐厅的美食。
-79、到雅昌艺术中心，朝圣亚洲最大的书墙。
-80、去看火烈鸟。</p>
-<h2>关于其它</h2>
-<p>很多事情可能没有想到，所以就没写进去，但是我会根据实际情况进行调整，人不是机器，不能为了实现目标而把自己折腾的那么累。不管怎样我会认真过好每一天，相信未来也不会太差。
-81、定期复盘、每周、每月、半年、全年。
-82、认识一个外籍朋友，用英语进行学习交流。
-83、办理港澳通行证、台湾通行证、护照。
-84、飞行5个地方。
-85、去小街小巷嘈杂的环境无声的吃饭，用眼神交流。
-86、学习一些美学知识、小创意的知识，比如创意简笔画。
-87、梦想清单会根据时间、精力、金钱等因素进行调整。</p>
-<h2>写在最后</h2>
-<p>熄灭的火 能否烧光残留的念，
-梦中的云 能否化作熟悉的脸，
-前世的劫 能否换来今生的缘，
-能否早一点 看透命运的伏线，
-能否不轻易就深陷，
-能否慢一点 挥霍有限的时间，
-能否许我一个永远。
-可能我撞了南墙才会回头吧，
-可能我见了黄河才会死心吧，
-可能我偏要一条路走到黑吧，
-可能我还没遇见 那个她吧~~~~
-不管怎么样，做最好的自己，继续阳光积极，继续不懈努力！未来，有更多精彩的故事等待我去发现，也许哪一天我就上了C位呢，夜空中最亮的星，我，一直向着它前行！
-&lt;img src=&quot;http://okmofxifx.bkt.clouddn.com/SZ.jpg&quot; width=&quot;800&quot; height=&quot;800&quot;/&gt;</p>
-
-          
+          <p>很多人问我，如何做年度计划才能遇见更好的自己？我看了一些自我管理达人和身边优秀的朋友，他们说：想成为更好的自己，我们需要学习一点投资理念，制定合理的梦想清单，然后让愿景清晰可见，而且你需要给自己的目标做分解，不断复盘、自我激励才能更好的去实现。<br>毕竟生活不止眼前的苟且，还有诗和远方的田野：<br>
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2018/07/03/2018年个人计划/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
