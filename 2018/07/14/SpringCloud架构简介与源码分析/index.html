@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.3.0" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.3.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.3.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.3.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.3.0" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '6.3.0',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="Spring Cloud是一个基于SpringBoot实现的微服务架构开发工具。它为微服务架构中涉及的配置管理、服务治理、断路器、智能路由、微代理、控制总线、全局锁、决策竞选、分布式会话和集群状态管理等操作提供了一种简单的开发方式。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="SpringCloud架构简介与源码分析">
+<meta property="og:url" content="http://yoursite.com/2018/07/14/SpringCloud架构简介与源码分析/index.html">
+<meta property="og:site_name" content="Rocky的狗窝">
+<meta property="og:description" content="Spring Cloud是一个基于SpringBoot实现的微服务架构开发工具。它为微服务架构中涉及的配置管理、服务治理、断路器、智能路由、微代理、控制总线、全局锁、决策竞选、分布式会话和集群状态管理等操作提供了一种简单的开发方式。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://okmofxifx.bkt.clouddn.com/mao.png">
+<meta property="og:image" content="http://okmofxifx.bkt.clouddn.com/Eureka.png">
+<meta property="og:image" content="http://okmofxifx.bkt.clouddn.com/Ribbon.png">
+<meta property="og:image" content="http://okmofxifx.bkt.clouddn.com/lianji.png">
+<meta property="og:image" content="http://okmofxifx.bkt.clouddn.com/hystrix.png">
+<meta property="og:image" content="http://okmofxifx.bkt.clouddn.com/mingling.png">
+<meta property="og:image" content="http://okmofxifx.bkt.clouddn.com/Dashboard.png">
+<meta property="og:image" content="http://okmofxifx.bkt.clouddn.com/Cloud.png">
+<meta property="og:updated_time" content="2018-07-14T07:14:08.926Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="SpringCloud架构简介与源码分析">
+<meta name="twitter:description" content="Spring Cloud是一个基于SpringBoot实现的微服务架构开发工具。它为微服务架构中涉及的配置管理、服务治理、断路器、智能路由、微代理、控制总线、全局锁、决策竞选、分布式会话和集群状态管理等操作提供了一种简单的开发方式。">
+<meta name="twitter:image" content="http://okmofxifx.bkt.clouddn.com/mao.png">
+
+
+
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/07/14/SpringCloud架构简介与源码分析/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>SpringCloud架构简介与源码分析 | Rocky的狗窝</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Rocky的狗窝</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <p class="site-subtitle">喜欢是一种幸福，被喜欢是一种天赋</p>
+      
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />首页</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+    <a href="/about/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-user"></i> <br />关于</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />归档</a>
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/07/14/SpringCloud架构简介与源码分析/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="宋祺鹏">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Rocky的狗窝">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">SpringCloud架构简介与源码分析
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2018-07-14 10:20:04 / 修改时间：15:14:08" itemprop="dateCreated datePublished" datetime="2018-07-14T10:20:04+08:00">2018-07-14</time>
+            
+
+            
+              
+
+              
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p><img src="http://okmofxifx.bkt.clouddn.com/mao.png" width="100" height="100"><br>Spring Cloud是一个基于SpringBoot实现的微服务架构开发工具。它为微服务架构中涉及的配置管理、服务治理、断路器、智能路由、微代理、控制总线、全局锁、决策竞选、分布式会话和集群状态管理等操作提供了一种简单的开发方式。<br><a id="more"></a></p>
+<h2 id="Spring-Cloud简介"><a href="#Spring-Cloud简介" class="headerlink" title="Spring Cloud简介"></a>Spring Cloud简介</h2><h3 id="Spring-Cloud主要子项目"><a href="#Spring-Cloud主要子项目" class="headerlink" title="Spring Cloud主要子项目"></a>Spring Cloud主要子项目</h3><p>1、Config：配置开发工具包，可以把配置放到远程服务器，支持本地存储、Git以及Subversion。<br>2、Netflix：针对多种Netflix组件提供的开发工具包，其中包括Eureka、Hystrix等。<br>3、Eureka：云端负载均衡，基于REST风格 ，实现云端的负载均衡和中间层服务器的故障转移。<br>4、Ribbon：负载均衡框架，支持可插拔式的负载均衡规则支持多种协议和客户端。<br>5、Feign：被集成到Netflix模块，使得写Http客户端变得更加简单。<br>6、Hystrix：容错管理工具，通过控制服务和第三方库的节点,从而对延迟和故障提供更强大的容错能力。<br>7、Bus：事件、消息总线，在集群中传播状态变化，可与Spring Cloud Config联合实现热部署。<br>8、Zuul：边缘服务工具，是提供动态路由，监控，弹性，安全等的边缘服务。<br>9、Archaius：配置管理API，提供动态类型化属性、线程安全配置操作、轮询框架、回调机制等功能。<br>10、Sleuth：日志收集工具包，封装了Dapper,Zipkin和HTrace操作。<br>11、Data Flow：大数据操作工具，通过命令行方式操作数据流。<br>12、Security：安全工具包，为你的应用程序添加安全控制，主要是指OAuth2。<br>13、Consul：封装了服务发现与配置工具Consul的相关操作，与Docker容器可以无缝集成。<br>14、Zookeeper：操作Zookeeper的工具包，用于使用zookeeper方式的服务注册和发现。<br>15、Stream：数据流操作开发包，封装了与Redis,Rabbit、Kafka等发送接收消息。  </p>
+<h3 id="微服务特征"><a href="#微服务特征" class="headerlink" title="微服务特征"></a>微服务特征</h3><p>1、每个微服务可独立运行在自己的进程里。<br>2、一系列独立运行的微服务共同构建起了整个系统。<br>3、每个服务为独立的业务开发，一个微服务一般完成某个特定的功能。<br>4、微服务之间通过一些轻量的通信机制进行通信，例如通过REST API或者RPC的方式进行调用。  </p>
+<h3 id="微服务优缺点"><a href="#微服务优缺点" class="headerlink" title="微服务优缺点"></a>微服务优缺点</h3><p>1、易于开发和维护。<br>2、启动较快。<br>3、局部修改容易部署。<br>4、技术栈不受限。<br>5、按需伸缩。  </p>
+<h2 id="各模块分析"><a href="#各模块分析" class="headerlink" title="各模块分析"></a>各模块分析</h2><h3 id="Eureka服务治理"><a href="#Eureka服务治理" class="headerlink" title="Eureka服务治理"></a>Eureka服务治理</h3><p>服务治理是微服务架构中最为核心和基础的模块，它主要用来实现各个微服务实例的自动化注册和发现。<br>Eureka具有高等级的架构体系：<br><img src="http://okmofxifx.bkt.clouddn.com/Eureka.png" width="780" height="780"><br>在Maven中添加Eureka客户端依赖：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&lt;dependency&gt;</span><br><span class="line">   &lt;groupId&gt;org.springframework.cloud&lt;/groupId&gt;</span><br><span class="line">   &lt;artifactId&gt;spring-cloud-starter-eureka&lt;/artifactId&gt;</span><br><span class="line">&lt;/dependency&gt;</span><br></pre></td></tr></table></figure></p>
+<p>继续添加Eureka服务端依赖：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&lt;dependency&gt;</span><br><span class="line">   &lt;groupId&gt;org.springframework.cloud&lt;/groupId&gt;</span><br><span class="line">   &lt;artifactId&gt;spring-cloud-starter-eureka-server&lt;/artifactId&gt;</span><br><span class="line">&lt;/dependency&gt;</span><br></pre></td></tr></table></figure></p>
+<p>启用Eureka Client：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">@EnableDiscoveryClient</span><br><span class="line">@SpringBootApplication</span><br><span class="line">public class EurekaClientApplication &#123;</span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        SpringApplication.run(EurekaClientApplication.class, args);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>启用Eureka Server：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">@EnableEurekaServer</span><br><span class="line">@SpringBootApplication</span><br><span class="line">public class EurekaServerApplication &#123;</span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        SpringApplication.run(EurekaServerApplication.class, args);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>关于服务续约有两个重要属性，renewal-interval用于定义服务续约任务的调用间隔时间，expiration-duration用于定义服务的失效时间。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">eureka.instance.lease-renewal-interval-in-seconds=30</span><br><span class="line">eureka.instance.lease-expiration-duration-in-seconds=90</span><br></pre></td></tr></table></figure></p>
+<p>服务注册到Eureka Server之后，会维护一个心跳连接，运行期间会统计心跳失败的比例在15分钟之内是否低于85%，如果出现低于的情况，Eureka Server会将当前的实例注册信息保护起来，让这些实例不会过期。<br>leaseRenewalIntervalInSeconds：Client发送心跳的频率。<br>renewalPercentThreshold：触发自我保护的心跳数比例阈值。<br>renewalThresholdUpdateIntervalMs：多久重置一下心跳阈值。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">eureka.instance.leaseRenewalIntervalInSeconds = 30</span><br><span class="line">eureka.server.renewalPercentThreshold = 0.85</span><br><span class="line">eureka.server.renewalThresholdUpdateIntervalMs = 15 * 60 * 1000</span><br></pre></td></tr></table></figure></p>
+<h3 id="Ribbon负载均衡"><a href="#Ribbon负载均衡" class="headerlink" title="Ribbon负载均衡"></a>Ribbon负载均衡</h3><p>先看一个简单的例子：<br><img src="http://okmofxifx.bkt.clouddn.com/Ribbon.png" width="780" height="780"><br>在工程的启动类中,通过@EnableDiscoveryClient向服务中心注册，@LoadBalanced开启相应bean的负载均衡功能，会被配置为自动使用Ribbon的LoadBalancerClient来选择服务的URL并发送请求。如果要使用@RibbonClient(name=”***”)注解，就会标记此项目为Ribbon负载均衡的客户端，它需要选择产品服务集群中其中的一台来访问所需要的服务，这里的name属性对应于项目中配置的spring.application.name属性。<br>同时，在Maven中引入相关依赖：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&lt;dependency&gt;</span><br><span class="line">   &lt;groupId&gt;org.springframework.cloud&lt;/groupId&gt;</span><br><span class="line">   &lt;artifactId&gt;spring-cloud-starter-ribbon&lt;/artifactId&gt;</span><br><span class="line">&lt;/dependency&gt;</span><br></pre></td></tr></table></figure></p>
+<h3 id="Feign客户端服务。"><a href="#Feign客户端服务。" class="headerlink" title="Feign客户端服务。"></a>Feign客户端服务。</h3><p>Feign是一个声明式的伪Http客户端，它使得写Http客户端变得更简单。使用Feign，只需要创建一个接口并注解，它具有可插拔的注解特性，可使用Feign注解和JAX-RS注解，支持可插拔的编码器和解码器，默认集成了Ribbon，并和Eureka结合，实现了负载均衡的效果。<br>首先还是来看对应的Maven依赖：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&lt;dependency&gt;</span><br><span class="line">   &lt;groupId&gt;org.springframework.cloud&lt;/groupId&gt;</span><br><span class="line">   &lt;artifactId&gt;spring-cloud-starter-feign&lt;/artifactId&gt;</span><br><span class="line">&lt;/dependency&gt;</span><br></pre></td></tr></table></figure></p>
+<p>Feign有自己的builder：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">return</span> Feign.builder()</span><br><span class="line">	.Decoder(new GsonDecoder())</span><br><span class="line">		.logger(new Logger.JavaLogger().appendToFile(<span class="string">"logs/my.log"</span>))</span><br><span class="line">			.logLevel(Logger.Level.FULL)</span><br><span class="line">				.target(Rocky.class,<span class="string">"https://www.songqipeng.cn"</span>);</span><br></pre></td></tr></table></figure></p>
+<p>通过@EnableFeignClients开启Feign，定义Feign接口类时通过@ FeignClient(“服务名”)指定调用哪个服务。</p>
+<h3 id="Hystrix容错框架"><a href="#Hystrix容错框架" class="headerlink" title="Hystrix容错框架"></a>Hystrix容错框架</h3><p>在日常项目维护过程中，网络请求失败导致服务延迟时间增加，甚至跨系统之间的联级故障时常存在。<br><img src="http://okmofxifx.bkt.clouddn.com/lianji.png" width="780" height="780"><br>例如一个依赖30个SOA服务的系统,每个服务99.99%可用，99.99%的30次方约等于99.7%，0.3%意味着一亿次请求会有3,000,00次失败，换算成时间大约每月有2个小时服务不稳定，随着服务依赖数量增加，服务不稳定的概率会成指数性增长。<br>首先引入Hystrix的依赖：<br><img src="http://okmofxifx.bkt.clouddn.com/hystrix.png" width="600" height="600"><br>同步化执行使用execute()<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">public void <span class="function"><span class="title">Synchronous</span></span>() &#123;</span><br><span class="line">    assertEquals(<span class="string">"Hello World!"</span>, new CommandHelloWorld(<span class="string">"World"</span>).execute());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>异步化执行使用queue()<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">public void Asynchronous() throws Exception &#123;</span><br><span class="line">    Future&lt;String&gt; future = new CommandHelloWorld(<span class="string">"World"</span>).queue();</span><br><span class="line">    assertEquals(<span class="string">"Hello World!"</span>, future.get());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>使用execute()同步调用效果等同于异步使用queue().get()的调用效果。<br>接下来看如何使用命令模式封装依赖逻辑：<br><img src="http://okmofxifx.bkt.clouddn.com/mingling.png" width="780" height="780"><br>除了HystrixBadRequestException异常之外，所有从run()方法抛出的异常都算作失败，并触发降级getFallback()和断路器逻辑：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">@Override  </span><br><span class="line">protected String <span class="function"><span class="title">getFallback</span></span>() &#123;</span><br><span class="line">    <span class="built_in">return</span> <span class="string">"执行失败"</span>;  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>CommandGroup用于对不同依赖的线程池/信号区分，而每个CommandKey代表一个依赖抽象，依赖隔离的根本就是对相同CommandKey的依赖做隔离：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">super(</span><br><span class="line">    Setter.withGroupKey(HystrixCommandGroupKey.Factory.asKey(<span class="string">"CommandGroup"</span>))</span><br><span class="line">        .andCommandKey(HystrixCommandKey.Factory.asKey(<span class="string">"HelloWorld"</span>))</span><br><span class="line">     );</span><br></pre></td></tr></table></figure></p>
+<p>对同一依赖的不同远程调用使用HystrixThreadPoolKey做隔离区分：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Setter.withGroupKey(HystrixCommandGroupKey.Factory.asKey(<span class="string">"CommandGroup"</span>))</span><br><span class="line">    .andThreadPoolKey(HystrixThreadPoolKey.Factory.asKey(<span class="string">"HelloWorldPool"</span>)));</span><br></pre></td></tr></table></figure></p>
+<p>同时在Dashboard面板对依赖关键指标进行实时监控：<br><img src="http://okmofxifx.bkt.clouddn.com/Dashboard.png" width="780" height="780"></p>
+<h2 id="总结与归纳"><a href="#总结与归纳" class="headerlink" title="总结与归纳"></a>总结与归纳</h2><p>最后在这里用一张脑图归纳与总结Spring Cloud的相关知识：<br><img src="http://okmofxifx.bkt.clouddn.com/Cloud.png" width="780" height="780"></p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      <div>
+        <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+  <div>您的支持鼓励就是鄙人前进的最大动力</div>
+  <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+    <span>打赏</span>
+  </button>
+  <div id="QR" style="display: none;">
+
+    
+      <div id="wechat" style="display: inline-block">
+        <img id="wechat_qr" src="/images/weixin.jpg" alt="宋祺鹏 微信支付"/>
+        <p>微信支付</p>
+      </div>
+    
+
+    
+      <div id="alipay" style="display: inline-block">
+        <img id="alipay_qr" src="/images/zhifubao.jpg" alt="宋祺鹏 支付宝"/>
+        <p>支付宝</p>
+      </div>
+    
+
+    
+
+  </div>
+</div>
+
+      </div>
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/07/08/写一段Java程序，将JSON中下划线命名的key转换为驼峰式命名的key/" rel="next" title="写一段Java程序，将JSON中下划线命名的key转换为驼峰式命名的key">
+                <i class="fa fa-chevron-left"></i> 写一段Java程序，将JSON中下划线命名的key转换为驼峰式命名的key
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">宋祺鹏</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">5</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Spring-Cloud简介"><span class="nav-number">1.</span> <span class="nav-text">Spring Cloud简介</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Spring-Cloud主要子项目"><span class="nav-number">1.1.</span> <span class="nav-text">Spring Cloud主要子项目</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#微服务特征"><span class="nav-number">1.2.</span> <span class="nav-text">微服务特征</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#微服务优缺点"><span class="nav-number">1.3.</span> <span class="nav-text">微服务优缺点</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#各模块分析"><span class="nav-number">2.</span> <span class="nav-text">各模块分析</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Eureka服务治理"><span class="nav-number">2.1.</span> <span class="nav-text">Eureka服务治理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Ribbon负载均衡"><span class="nav-number">2.2.</span> <span class="nav-text">Ribbon负载均衡</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Feign客户端服务。"><span class="nav-number">2.3.</span> <span class="nav-text">Feign客户端服务。</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Hystrix容错框架"><span class="nav-number">2.4.</span> <span class="nav-text">Hystrix容错框架</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结与归纳"><span class="nav-number">3.</span> <span class="nav-text">总结与归纳</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">宋祺鹏</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动 v3.7.1</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://theme-next.org">NexT.Muse</a> v6.3.0</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.3.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.3.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.3.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.3.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.3.0"></script>
+
+
+
+  
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
